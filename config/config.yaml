@@ -3,7 +3,7 @@ img_file: ./data/raw/
 train_csv_path: ./data/raw/train.csv
 test_csv_path: ./data/raw/test.csv
 batch_size: 128
-num_workers: 2
+num_workers: 0
 
 # model
 num_outputs: 176

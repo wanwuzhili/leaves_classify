@@ -7,14 +7,15 @@ def evaluate_accuracy(net, data_iter, device):
     if isinstance(net, nn.Module):
         net.eval()
     accs = []
-    for img, y in data_iter:
-        img, y = img.to(device), y.to(device)
-        y_hat = net(img)
+    with torch.no_grad():
+        for img, y in data_iter:
+            img, y = img.to(device), y.to(device)
+            y_hat = net(img)
 
-        y_hat = y_hat.argmax(dim=1)
-        cmp = y_hat.reshape(y.shape).type(y.dtype) == y
-        acc = torch.sum(cmp) / len(cmp)
-        accs.append(acc.item())
+            y_hat = y_hat.argmax(dim=1)
+            cmp = y_hat.reshape(y.shape).type(y.dtype) == y
+            acc = torch.sum(cmp) / len(cmp)
+            accs.append(acc.item())
 
     return sum(accs) / len(accs)
 
@@ -24,6 +25,8 @@ def try_gpu(i=0):
     return torch.device('cpu')
 
 def train_epoch(net, train_iter, loss:nn.CrossEntropyLoss, updater:optim.Optimizer, device):
+    if isinstance(net, nn.Module):
+            net.train()
     ls = []
     for img, y in train_iter:
         img, y = img.to(device), y.to(device)
@@ -37,8 +40,6 @@ def train_epoch(net, train_iter, loss:nn.CrossEntropyLoss, updater:optim.Optimiz
     return sum(ls) / len(ls)
 
 def train(net, train_iter, valid_iter, num_epochs, lr, weight_decay, device):
-    if isinstance(net, nn.Module):
-        net.train()
     net = net.to(device)
 
     loss = nn.CrossEntropyLoss()

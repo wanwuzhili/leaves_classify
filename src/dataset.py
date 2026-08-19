@@ -13,6 +13,8 @@ class ImageDataset(Dataset):
         super().__init__()
         self.img_file = img_file
         self.train_data = pd.read_csv(train_csv_path)
+        self.images = self.train_data.iloc[:, 0].to_numpy()
+        self.label = self.train_data.iloc[:, 1].to_numpy()
         self.trans = trans
         self.label_trans = label_trans
 
@@ -20,11 +22,11 @@ class ImageDataset(Dataset):
         return len(self.train_data)
 
     def __getitem__(self, i):
-        img_path = os.path.join(self.img_file, self.train_data.iloc[i, 0])
+        img_path = os.path.join(self.img_file, self.images[i])
         img = io.read_image(img_path)
         if self.trans:
             img = self.trans(img)
-        label = self.train_data.iloc[i, 1]
+        label = self.label[i]
         if self.label_trans:
             label = self.label_trans.transform([label])[0]
 
@@ -58,14 +60,14 @@ class TestImageDataset(Dataset):
     def __init__(self, img_file, test_csv_path, trans=None):
         super().__init__()
         self.img_file = img_file
-        self.test_data = pd.read_csv(test_csv_path)
+        self.test_data = pd.read_csv(test_csv_path).to_numpy()
         self.trans = trans
 
     def __len__(self):
         return len(self.test_data)
 
     def __getitem__(self, i):
-        img_path = os.path.join(self.img_file, self.test_data.iloc[i, 0])
+        img_path = os.path.join(self.img_file, self.test_data[i])
         img = io.read_image(img_path)
         if self.trans:
             img = self.trans(img)
