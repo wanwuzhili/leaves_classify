@@ -1,3 +1,15 @@
 # data
-raw_data_path: ./data/raw/
+img_file: ./data/raw/
+train_csv_path: ./data/raw/train.csv
+test_csv_path: ./data/raw/test.csv
 batch_size: 128
+num_workers: 2
+
+# model
+num_outputs: 176
+model_path: ./model/bs128_ep10_lre-3.pth
+
+# training
+num_epochs: 10
+lr: 0.001
+weight_decay: 0

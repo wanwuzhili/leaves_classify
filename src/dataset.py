@@ -52,3 +52,26 @@ def get_data_loader(img_file, train_csv_path, batch_size,
         DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers),
         DataLoader(valid_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
     )
+
+class TestImageDataset(Dataset):
+    """用于测试数据的 Dataset，不包含标签"""
+    def __init__(self, img_file, test_csv_path, trans=None):
+        super().__init__()
+        self.img_file = img_file
+        self.test_data = pd.read_csv(test_csv_path)
+        self.trans = trans
+
+    def __len__(self):
+        return len(self.test_data)
+
+    def __getitem__(self, i):
+        img_path = os.path.join(self.img_file, self.test_data.iloc[i, 0])
+        img = io.read_image(img_path)
+        if self.trans:
+            img = self.trans(img)
+        return img.type(torch.float32)
+
+def get_test_data_loader(img_file, test_csv_path, batch_size, num_workers=0, trans=None):
+    """为测试数据创建 DataLoader"""
+    dataset = TestImageDataset(img_file, test_csv_path, trans=trans)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
