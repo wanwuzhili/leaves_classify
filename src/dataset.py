@@ -23,14 +23,14 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, i):
         img_path = os.path.join(self.img_file, self.images[i])
-        img = io.read_image(img_path)
+        img = io.read_image(img_path).type(torch.float32)
         if self.trans:
             img = self.trans(img)
         label = self.label[i]
         if self.label_trans:
             label = self.label_trans.transform([label])[0]
 
-        return img.type(torch.float32), torch.tensor(label, dtype=torch.long)
+        return img, torch.tensor(label, dtype=torch.long)
 
 def label_encoder(train_csv_path):
     labels = pd.read_csv(train_csv_path).iloc[:, 1]
@@ -60,7 +60,7 @@ class TestImageDataset(Dataset):
     def __init__(self, img_file, test_csv_path, trans=None):
         super().__init__()
         self.img_file = img_file
-        self.test_data = pd.read_csv(test_csv_path).to_numpy()
+        self.test_data = pd.read_csv(test_csv_path).iloc[:,0].to_numpy()
         self.trans = trans
 
     def __len__(self):
@@ -68,10 +68,10 @@ class TestImageDataset(Dataset):
 
     def __getitem__(self, i):
         img_path = os.path.join(self.img_file, self.test_data[i])
-        img = io.read_image(img_path)
+        img = io.read_image(img_path).type(torch.float32)
         if self.trans:
             img = self.trans(img)
-        return img.type(torch.float32)
+        return img
 
 def get_test_data_loader(img_file, test_csv_path, batch_size, num_workers=0, trans=None):
     """为测试数据创建 DataLoader"""

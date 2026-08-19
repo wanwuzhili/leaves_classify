@@ -2,6 +2,7 @@ import torch
 import pandas as pd
 import joblib
 import yaml
+import torchvision.transforms as T
 
 import src.model as m
 import src.dataset as ds
@@ -23,11 +24,17 @@ net = net.to(device)
 net.eval()
 
 # load test data loader (with batching)
+trans = T.Compose(
+    T.Resize(224),
+    T.Normalize(mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225])
+)
 test_loader = ds.get_test_data_loader(
     img_file=configs['img_file'],
     test_csv_path=configs['test_csv_path'],
     batch_size=configs['batch_size'],
-    num_workers=configs['num_workers']
+    num_workers=configs['num_workers'],
+    trans=trans
 )
 
 # load original test data to get image names
