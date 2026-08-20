@@ -12,11 +12,11 @@ with open('./config/config.yaml', 'r') as f:
     configs = yaml.safe_load(f)
 
 # load data
-trans = T.Compose(
+trans = T.Compose([
     T.Resize(224),
     T.Normalize(mean=[0.485, 0.456, 0.406],
                 std=[0.229, 0.224, 0.225])
-)
+])
 train_iter, valid_iter = ds.get_data_loader(
     img_file=configs['img_file'], train_csv_path=configs['train_csv_path'],
     batch_size=configs['batch_size'], num_workers=configs['num_workers'], trans=trans
