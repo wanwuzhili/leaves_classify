@@ -61,7 +61,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, weight_decay, device):
     plt.plot(x, train_accs, label='train acc')
     plt.plot(x, valid_accs, label='valid acc')
     plt.legend()
-    plt.show()
     plt.savefig('./loss.png')
+    plt.show()
 
 
