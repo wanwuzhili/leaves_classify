@@ -23,7 +23,7 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, i):
         img_path = os.path.join(self.img_file, self.images[i])
-        img = io.read_image(img_path).type(torch.float32)
+        img = io.read_image(img_path).float() / 255.0
         if self.trans:
             img = self.trans(img)
         label = self.label[i]
@@ -49,7 +49,8 @@ def get_data_loader(img_file, train_csv_path, batch_size,
     num = dataset.__len__()
     num_train = round(0.8 * num)
     num_valid = num - num_train
-    train_dataset, valid_dataset = random_split(dataset, [num_train, num_valid])
+    generator = torch.Generator.manual_seed(42)
+    train_dataset, valid_dataset = random_split(dataset, [num_train, num_valid], generator=generator)
     return (
         DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers),
         DataLoader(valid_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
@@ -68,7 +69,7 @@ class TestImageDataset(Dataset):
 
     def __getitem__(self, i):
         img_path = os.path.join(self.img_file, self.test_data[i])
-        img = io.read_image(img_path).type(torch.float32)
+        img = io.read_image(img_path).float() / 255.0
         if self.trans:
             img = self.trans(img)
         return img
